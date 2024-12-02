@@ -5,7 +5,8 @@ import 'package:path/path.dart' as p;
 void main(List<String> arguments) {
   List<int> list0 = [];
   List<int> list1 = [];
-  List<int> result = [];
+  var result = 0;
+  var similarity = 0;
 
   var filePath = p.join(Directory.current.path, 'input.txt');
   File file = File(filePath);
@@ -27,7 +28,9 @@ void main(List<String> arguments) {
   list1.sort();
 
   for (var i = 0; i < list0.length; i++) {
-    result.add((list0[i] - list1[i]).abs());
+    result += ((list0[i] - list1[i]).abs());
+    similarity += list0[i] * list1.where((item) => item == list0[i]).length;
   }
-  print(result.sum);
+  print(result);
+  print(similarity);
 }
