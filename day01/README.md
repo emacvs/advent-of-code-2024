@@ -39,8 +39,6 @@ Your actual left and right lists contain many location IDs. What is the total di
 
 Your puzzle answer was 1666427.
 
-The first half of this puzzle is complete! It provides one gold star: *
-
 --- Part Two ---
 Your analysis only confirmed what everyone feared: the two lists of location IDs are indeed very different.
 
@@ -70,9 +68,6 @@ So, for these example lists, the similarity score at the end of this process is 
 
 Once again consider your left and right lists. What is their similarity score?
 
-Answer: 
- 
+Your puzzle answer was 24316233.
 
-Although it hasn't changed, you can still get your puzzle input.
-
-You can also [Share] this puzzle.
+Both parts of this puzzle are complete! They provide two gold stars: **
