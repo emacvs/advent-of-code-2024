@@ -3,16 +3,23 @@
 import 'dart:io';
 import 'package:path/path.dart' as p;
 
-const WORD_KEY = "XMAS";
-const DIRECTIONS = [
-  [0, 1], // >
-  [0, -1], // <
-  [1, 0], // V
-  [-1, 0], // ^
-  [-1, 1], // ^>
-  [1, 1], // V>
-  [1, -1], // V<
-  [-1, -1] // ^<
+const WORD_KEY = "MAS";
+
+class Direction {
+  final int directionR;
+  final int directionC;
+  final int positionR;
+  final int positionC;
+
+  Direction(this.directionR, this.directionC, this.positionR, this.positionC);
+}
+
+//set direction & offset to start to search word
+List<Direction> directions = [
+  Direction(1, 1, 0, 0), //V>
+  Direction(1, -1, 0, 2), // V<
+  Direction(-1, -1, 2, 2), // ^<
+  Direction(-1, 1, 2, 0), // ^>
 ];
 
 void main(List<String> arguments) {
@@ -27,24 +34,34 @@ int searchWordInMatrix(String word, List<List<String>> matrix) {
   var wordFind = 0;
   for (var r = 0; r < matrix.length; r++) {
     for (var c = 0; c < matrix[r].length; c++) {
-      for (var direction in DIRECTIONS) {
-        if (isValidWord(matrix, word, r, c, direction[0], direction[1])) {
-          wordFind++;
-        }
+      if (findX(matrix, word, r, c)) {
+        wordFind++;
       }
     }
   }
   return wordFind;
 }
 
+bool findX(matrix, word, r, c) {
+  var xfind = 0;
+  for (var direction in directions) {
+    var row = r + direction.positionR;
+    var col = c + direction.positionC;
+    if (isValidWord(matrix, word, row, col, direction)) {
+      xfind++;
+    }
+  }
+  return xfind >= 2;
+}
+
 bool isValidWord(
-    List<List<String>> matrix, String word, int r, int c, int dr, int dc) {
+    List<List<String>> matrix, String word, int r, int c, Direction direction) {
   for (var i = 0; i < word.length; i++) {
     if (isOutOfLimit(matrix, r, c) || matrix[r][c] != word[i]) {
       return false;
     }
-    c += dc;
-    r += dr;
+    c += direction.directionC;
+    r += direction.directionR;
   }
   return true;
 }
