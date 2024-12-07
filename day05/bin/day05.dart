@@ -1,6 +1,7 @@
 // ignore_for_file: constant_identifier_names
 
 import 'dart:io';
+import 'package:collection/collection.dart';
 import 'package:path/path.dart' as p;
 
 void main(List<String> arguments) {
@@ -10,9 +11,12 @@ void main(List<String> arguments) {
   rules = parseData(data[0].split("\n"), "|");
   manuals = parseData(data[1].split("\n"), ",");
 
-  var correctManuals = getCorrectManuals(rules, manuals);
-  var result = sumMiddleElement(correctManuals);
-  print(result);
+  var parsedManuals = getParsedManuals(rules, manuals);
+  var fixedManuals = fixManuals(parsedManuals[1], rules);
+  var resultCorrect = sumMiddleElement(parsedManuals[0]);
+  var resultFixed = sumMiddleElement(fixedManuals);
+  print(resultCorrect);
+  print(resultFixed);
 }
 
 //Function to read file
@@ -33,36 +37,44 @@ List<List<int>> parseData(List<String> data, String separator) {
 }
 
 //function to check rule
-List<List<int>> getCorrectManuals(
+List<List<List<int>>> getParsedManuals(
     List<List<int>> rules, List<List<int>> manuals) {
   List<List<int>> correctManuals = [];
+  List<List<int>> incorrectManuals = [];
   for (var manual in manuals) {
-    var isAllCorrect = true;
-    for (var pI = 0; pI < manual.length; pI++) {
-      var isCorrect = true;
-      var filteredRules = getFilteredRules(rules, manual[pI]);
-      for (var filteredRule in filteredRules) {
-        var index = manual.indexOf(filteredRule[1]);
-        if (index > pI || index == -1) {
-          isCorrect = true;
-        } else {
-          isCorrect = false;
-          break;
-        }
-      }
-      if (isCorrect) {
-        isAllCorrect = true;
-      } else {
-        isAllCorrect = false;
-        break;
-      }
-    }
+    var isAllCorrect = isManualCorrect(rules, manual);
     if (isAllCorrect) {
       correctManuals.add(manual);
+    } else {
+      incorrectManuals.add(manual);
     }
   }
 
-  return correctManuals;
+  return [correctManuals, incorrectManuals];
+}
+
+bool isManualCorrect(List<List<int>> rules, List<int> manual) {
+  var isAllCorrect = true;
+  for (var pI = 0; pI < manual.length; pI++) {
+    var isCorrect = true;
+    var filteredRules = getFilteredRules(rules, manual[pI]);
+    for (var filteredRule in filteredRules) {
+      var index = manual.indexOf(filteredRule[1]);
+      if (index > pI || index == -1) {
+        isCorrect = true;
+      } else {
+        isCorrect = false;
+        break;
+      }
+    }
+    if (isCorrect) {
+      isAllCorrect = true;
+    } else {
+      isAllCorrect = false;
+      break;
+    }
+  }
+  return isAllCorrect;
 }
 
 List<List<int>> getFilteredRules(List<List<int>> rules, int page) {
@@ -79,4 +91,28 @@ int sumMiddleElement(List<List<int>> manuals) {
 
 int getMiddleElement(List<int> list) {
   return list[(list.length ~/ 2)];
+}
+
+List<int> fixManual(List<int> manual, List<List<int>> rules) {
+  var fixed = manual;
+  for (var pI = 0; pI < manual.length; pI++) {
+    var filteredRules = getFilteredRules(rules, manual[pI]);
+    for (var filteredRule in filteredRules) {
+      var index = manual.indexOf(filteredRule[1]);
+      if (index <= pI && index != -1) {
+        fixed.swap(pI, index);
+        fixed = fixManual(fixed, rules);
+        break;
+      }
+    }
+  }
+  return fixed;
+}
+
+List<List<int>> fixManuals(List<List<int>> manuals, List<List<int>> rules) {
+  List<List<int>> fixedManuals = [];
+  for (var manual in manuals) {
+    fixedManuals.add(fixManual(manual, rules));
+  }
+  return fixedManuals;
 }
